@@ -1,4 +1,4 @@
-import pexpect
+import telnetlib
 
 # Define Variables
 ip_address = '192.168.56.101'
@@ -6,55 +6,32 @@ username = 'cisco'
 password = 'cisco123!'
 new_hostname = 'NewHostname'
 
-# Create telnet session
-session = pexpect.spawn('telnet ' + ip_address, encoding= 'utf-8', timeout=20)
+# Establish Telnet Connection
+telnet_connection = telnetlib.Telnet(ip_address)
 
-result = session.expect(['Username:', pexpect.TIMEOUT])
+# Login to the device
+telnet_connection.read_until(b'Username: ')
+telnet_connection.write(username.encode('ascii') + b'\n')
+telnet_connection.read_until(b'Password: ')
+telnet_connection.write(password.encode('ascii') + b'\n')
 
-# Check for error, if exists then display error and exit
-if result != 0:
-    print('--- FAILURE! creating session for: ', ip_address)
-    exit()
+# Enter Privileged EXEC Mode
+telnet_connection.read_until(b'#')
+telnet_connection.write(b'enable\n')
+telnet_connection.read_until(b'Password: ')
+telnet_connection.write(password.encode('ascii') + b'\n')
 
-# Session is expecting username, enter details
-session.sendline(username)
-result = session.expect(['Password:', pexpect.TIMEOUT])
-
-# Check for error, if exists then display error and exit
-if result != 0:
-    print('--- FAILURE! entering username:' , username)
-    exit()
-
-# Session is expecting password, enter details
-session.sendline(password)
-result = session.expect(['#', pexpect.TIMEOUT])
-
-# Check for error, if exists then display error and exit
-if result != 0:
-    print('--- FAILURE! entering password:', password)
-    exit()
-
-# Display a success message if it works
-print('-------------------------------------------------')    
-print('')
-print('--- Success! connecting to:', ip_address)
-print('---               Username:', username)
-print('---               Password:', password)
-print('')
-print('---------------------------------')
-
-# Modify the device hostname
-session.sendline('configure terminal')
-session.expect('#')
-session.sendline('hostname ' + new_hostname)
-session.expect('#')
+# Configure the device
+telnet_connection.write(b'configure terminal\n')
+telnet_connection.read_until(b'#')
+telnet_connection.write(f'hostname {new_hostname}\n'.encode('ascii'))
+telnet_connection.read_until(b'#')
 
 # Save the configuration
-session.sendline('end')
-session.expect('#')
-session.sendline('write memory')
-session.expect('#')
+telnet_connection.write(b'end\n')
+telnet_connection.read_until(b'#')
+telnet_connection.write(b'write memory\n')
+telnet_connection.read_until(b'#')
 
-#Terminate telnet to device and close session
-session.sendline('quit')
-session.close()
+# Close the Telnet Connection
+telnet_connection.write(b'quit\n')
