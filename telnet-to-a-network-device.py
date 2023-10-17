@@ -32,6 +32,7 @@ telnet_connection.write(b'end\n')
 telnet_connection.read_until(b'#')
 telnet_connection.write(b'write memory\n')
 telnet_connection.read_until(b'#')
-
+print("35")
 # Close the Telnet Connection
 telnet_connection.write(b'quit\n')
+print("38")
