@@ -17,9 +17,6 @@ telnet_connection.write(password.encode('ascii') + b'\n')
 print('17')
 # Enter Privileged EXEC Mode
 telnet_connection.read_until(b'#')
-#telnet_connection.write(b'enable\n')
-#telnet_connection.read_until(b'Password: ')
-#telnet_connection.write(password.encode('ascii') + b'\n')
 print('23')
 # Configure the device
 telnet_connection.write(b'configure terminal\n')
