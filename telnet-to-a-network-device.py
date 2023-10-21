@@ -32,10 +32,19 @@ telnet_connection.write(b'end\n')
 telnet_connection.read_until(b'#')
 telnet_connection.write(b'write memory\n')
 telnet_connection.read_until(b'#')
-print("35")  # Indicate successful configuration saving
+print("35")  # Indicate successful configuration and save this file locally
+
+# Send a command to the remote device to output the running configuration 
+telnet_connection.write(b'show running-config\n')
+output = telnet_connection.read_until(b'end').decode('ascii')
+print("38")
+
+# Save the output to a file
+with open('running_config.txt', 'w') as file:
+    file.write(output)
 
 # Close the Telnet Connection
 telnet_connection.write(b'quit\n')
-print("38")  # Indicate the closure of the Telnet connection
+print("42")  # Indicate the closure of the Telnet connection
 
 
