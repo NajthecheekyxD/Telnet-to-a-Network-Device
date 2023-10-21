@@ -37,7 +37,7 @@ print("35")  # Indicate successful configuration and save this file locally
 # Send a command to the remote device to output the running configuration 
 telnet_connection.write(b'show running-config\n')
 output = telnet_connection.read_until(b'end').decode('ascii')
-print("38")
+print("38") # Print the output of the running configuration
 
 # Save the output to a file
 with open('running_config.txt', 'w') as file:
