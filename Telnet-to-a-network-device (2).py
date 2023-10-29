@@ -8,7 +8,6 @@ new_hostname = 'NewHostname'
 
 # Establish Telnet Connection
 telnet_connection = telnetlib.Telnet(ip_address)
-print('11')  # Prints lines from 11-42
 
 def main_menu():
     while True:
@@ -41,16 +40,16 @@ def login():
     telnet_connection.write(username.encode('ascii') + b'\n')
     telnet_connection.read_until(b'Password: ')
     telnet_connection.write(password.encode('ascii') + b'\n')
-    print('17')  # Indicate successful login
+    telnet_connection.read_until(b'#')
+    print('17') # Indicate successful login
 
 def change_hostname():
     # Code to change the device's hostname
-    telnet_connection.read_until(b'#')
     telnet_connection.write(b'configure terminal\n')
     telnet_connection.read_until(b'#')
     telnet_connection.write(f'hostname {new_hostname}\n'.encode('ascii'))
     telnet_connection.read_until(b'#')
-    print('23')  # Indicate hostname change
+    print('23') # Indicate hostname change
 
 def save_configuration():
     # Code to save the configuration
@@ -58,19 +57,19 @@ def save_configuration():
     telnet_connection.read_until(b'#')
     telnet_connection.write(b'write memory\n')
     telnet_connection.read_until(b'#')
-    print("35")  # Indicate successful configuration saving
+    print("35") # Indicate successful configuration saving
 
 def show_running_config():
     # Code to display the running configuration
     telnet_connection.write(b'show running-config\n')
     output = telnet_connection.read_until(b'end').decode('ascii')
-    print("38")  # Indicate successful running configuration output
+    print("38") # Indicate successful running configuration output
     return output
 
 def quit_telnet():
     # Code to close the Telnet connection
     telnet_connection.write(b'quit\n')
-    print("42")  # Indicate the closure of the Telnet connection
+    print("42") # Indicate the closure of the Telnet connection
 
 if __name__ == "__main__":
     main_menu()
