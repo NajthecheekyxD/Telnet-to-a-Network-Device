@@ -43,8 +43,6 @@ while True:
         print(f"\n Running configuration saved to: running_config.txt")
 
     elif choice == "2":
-        new_hostname = input("Enter the new hostname: ")
-
         #Configure the device
         telnet_connection.write(b'configure terminal\n')
         telnet_connection.read_until(b'#')
