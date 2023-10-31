@@ -64,8 +64,3 @@ while True:
 # Close the Telnet Connection
 telnet_connection.write(b'quit\n')
 
-print("\n-"*50)
-print(f" Success!\n Device IP: {ip_address}\n Username: {username}\n Password: {password}")
-print("-"*50)
-
-
