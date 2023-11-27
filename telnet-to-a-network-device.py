@@ -38,7 +38,7 @@ def menu(telnet_connection):
             save_running_config(telnet_connection)
 
         elif choice == '3':
-            print("Telnet Connection Closed")
+            print("Exit")
             break
 
         else:
@@ -82,7 +82,7 @@ def main():
 
     # Close the Telnet Connection
     telnet_connection.write(b'quit\n')
-    print("Telnet connection closed.")
+    print("Telnet Connection Closed.")
 
 if __name__ == "__main__":
     main()
