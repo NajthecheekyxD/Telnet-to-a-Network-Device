@@ -53,13 +53,15 @@ def change_hostname(telnet_connection, new_hostname):
         'write memory'
     ]
     for command in commands:
-        execute_command(telnet_connection, command)
+        output = execute_command(telnet_connection, command)
+        print(output)  # Print the output after each command
     logging.info(f"Success! Hostname changed to: {new_hostname}")
 
 def save_running_config(telnet_connection):
     output = execute_command(telnet_connection, 'show running-config')
     with open('running_config.txt', 'w') as file:
         file.write(output)
+    print(output)  # Print the output after the 'show running-config' command
     logging.info("Success! Running configuration saved to: running_config.txt")
 
 def main():
@@ -71,7 +73,7 @@ def main():
     args = parser.parse_args()
 
     ip_address = args.ip or '192.168.56.101'
-    username = args.username or 'cisco'
+    username = args.username or input("Enter your username: ")
     password = args.password or getpass.getpass(prompt="Enter your password: ")
 
     # Configure logging
