@@ -1,6 +1,5 @@
 import telnetlib
 import getpass
-import logging
 import argparse
 
 def establish_telnet_connection(ip, username, password):
@@ -9,10 +8,10 @@ def establish_telnet_connection(ip, username, password):
         write_line(connection, username)
         write_line(connection, password)
         connection.read_until(b'#', timeout=5)  # Adjust the timeout as needed
-        logging.info(f"Telnet connection established to {ip}")
+        print(f"Telnet connection established to {ip}")
         return connection
     except Exception as e:
-        logging.error(f"Failed to establish telnet connection: {e}")
+        print(f"Failed to establish telnet connection: {e}")
         raise
 
 def write_line(connection, data):
@@ -55,14 +54,14 @@ def change_hostname(telnet_connection, new_hostname):
     for command in commands:
         output = execute_command(telnet_connection, command)
         print(output)  # Print the output after each command
-    logging.info(f"Success! Hostname changed to: {new_hostname}")
+    print(f"Success! Hostname changed to: {new_hostname}")
 
 def save_running_config(telnet_connection):
     output = execute_command(telnet_connection, 'show running-config')
     with open('running_config.txt', 'w') as file:
         file.write(output)
     print(output)  # Print the output after the 'show running-config' command
-    logging.info("Success! Running configuration saved to: running_config.txt")
+    print("Success! Running configuration saved to: running_config.txt")
 
 def main():
     # Argument parsing
@@ -76,9 +75,6 @@ def main():
     username = args.username or input("Enter your username: ")
     password = args.password or getpass.getpass(prompt="Enter your password: ")
 
-    # Configure logging
-    logging.basicConfig(filename='telnet_log.txt', level=logging.INFO)
-
     # Telnet Connection
     telnet_connection = establish_telnet_connection(ip_address, username, password)
 
@@ -86,7 +82,7 @@ def main():
 
     # Close the Telnet Connection
     telnet_connection.write(b'quit\n')
-    logging.info("Telnet connection closed.")
+    print("Telnet connection closed.")
 
 if __name__ == "__main__":
     main()
