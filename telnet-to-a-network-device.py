@@ -18,15 +18,14 @@ def establish_telnet_connection(ip, username, password):
 def write_line(connection, data):
     connection.write(data.encode('ascii') + b'\n')
 
-def execute_commands(telnet_connection, commands):
-    for command in commands:
-        write_line(telnet_connection, command)
-        output = telnet_connection.read_until(b'#', timeout=5).decode('ascii')  # Adjust the timeout as needed
-        return output
+def execute_command(telnet_connection, command):
+    write_line(telnet_connection, command)
+    output = telnet_connection.read_until(b'#', timeout=5).decode('ascii')  # Adjust the timeout as needed
+    return output
 
 def menu(telnet_connection):
     while True:
-        print("\n---MENU---")
+        print("\n---Telnet Menu---")
         print("1. Change Hostname")
         print("2. Save Running Configuration")
         print("3. Exit")
@@ -53,11 +52,12 @@ def change_hostname(telnet_connection, new_hostname):
         'end',
         'write memory'
     ]
-    execute_commands(telnet_connection, commands)
+    for command in commands:
+        execute_command(telnet_connection, command)
     logging.info(f"Success! Hostname changed to: {new_hostname}")
 
 def save_running_config(telnet_connection):
-    output = execute_commands(telnet_connection, ['show running-config'])
+    output = execute_command(telnet_connection, 'show running-config')
     with open('running_config.txt', 'w') as file:
         file.write(output)
     logging.info("Success! Running configuration saved to: running_config.txt")
