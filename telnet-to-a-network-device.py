@@ -7,7 +7,7 @@ def establish_telnet_connection(ip, username, password):
         connection = telnetlib.Telnet(ip)
         write_line(connection, username)
         write_line(connection, password)
-        connection.read_until(b'#', timeout=5)  # Adjust the timeout as needed
+        connection.read_until(b'#', timeout=5)  
         print(f"Telnet connection established to {ip}")
         return connection
     except Exception as e:
