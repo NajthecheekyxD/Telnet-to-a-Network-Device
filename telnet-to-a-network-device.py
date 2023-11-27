@@ -1,53 +1,85 @@
 import telnetlib
+import getpass
+import logging
+import argparse
 
-# Define Variables
-ip_address = '192.168.56.101'
-username = 'cisco'
-password = 'cisco123!'
-new_hostname = 'NewHostname'
+def establish_telnet_connection(ip, username, password):
+    try:
+        connection = telnetlib.Telnet(ip)
+        connection.write_line(username)
+        connection.write_line(password)
+        connection.read_until(b'#', timeout=5)  # Adjust the timeout as needed
+        logging.info(f"Telnet connection established to {ip}")
+        return connection
+    except Exception as e:
+        logging.error(f"Failed to establish telnet connection: {e}")
+        raise
+     
+def execute_commands(telnet_connection, commands):
+    for command in commands:
+        execute_command(telnet_connection, command)
+     
+def menu(telnet_connection):
+    while True:
+        print("\n---MENU---")
+        print("1. Change Hostname")
+        print("2. Save Running Configuration")
+        print("3. Exit")
+        choice = input("Enter your choice: ").lower()
 
-# Establish Telnet Connection
-telnet_connection = telnetlib.Telnet(ip_address)
+        if choice == '1':
+            new_hostname = input("Enter the new hostname: ")
+            change_hostname(telnet_connection, new_hostname)
 
+        elif choice == '2':
+            save_running_config(telnet_connection)
 
-# Login to the device
-telnet_connection.read_until(b'Username: ')
-telnet_connection.write(username.encode('ascii') + b'\n')
-telnet_connection.read_until(b'Password: ')
-telnet_connection.write(password.encode('ascii') + b'\n')
+        elif choice == '3':
+            print("Exit")
+            break
+
+        else:
+            print("Invalid choice. Please enter a valid option!")
+
+def change_hostname(telnet_connection, new_hostname):
+    commands = [
+        'configure terminal',
+        f'hostname {new_hostname}',
+        'end',
+        'write memory'
+    ]
+    execute_commands(telnet_connection, commands)
+    logging.info(f"Success! Hostname changed to: {new_hostname}")
  
+def save_running_config(telnet_connection):
+    output = execute_command(telnet_connection, 'show running-config')
+    with open('running_config.txt', 'w') as file:
+        file.write(output)
+    logging.info("Success! Running configuration saved to: running_config.txt")
 
-# Enter Privileged EXEC Mode
-telnet_connection.read_until(b'#')
- 
+def main():
+    # Argument parsing
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ip", help="Device IP address")
+    parser.add_argument("--username", help="Username")
+    parser.add_argument("--password", help="Password")
+    args = parser.parse_args()
 
-# Configure the device
-telnet_connection.write(b'configure terminal\n')
-telnet_connection.read_until(b'#')
-telnet_connection.write(f'hostname {new_hostname}\n'.encode('ascii'))
-telnet_connection.read_until(b'#')
+    ip_address = args.ip or '192.168.56.101'
+    username = args.username or 'cisco'
+    password = args.password or getpass.getpass(prompt="Enter your password: ")
 
-# Save the configuration
-telnet_connection.write(b'end\n')
-telnet_connection.read_until(b'#')
-telnet_connection.write(b'write memory\n')
-telnet_connection.read_until(b'#')
- 
+    # Configure logging
+    logging.basicConfig(filename='telnet_log.txt', level=logging.INFO)
 
-# Send a command to the remote device to output the running configuration 
-telnet_connection.write(b'show running-config\n')
-output = telnet_connection.read_until(b'end').decode('ascii')
- 
+    # Telnet Connection
+    telnet_connection = establish_telnet_connection(ip_address, username, password)
 
-# Save the output to a file
-with open('running_config.txt', 'w') as file:
-    file.write(output)
+    menu(telnet_connection)
 
-# Close the Telnet Connection
-telnet_connection.write(b'quit\n')
-  
-print('-' *50)
-print(f" Success!\n Device IP: {ip_address}\n Username: {username}\n Password: {password}")
-print(f" Running configuration saved to: running_config.txt\n Hostname changed to: {new_hostname}")
-print('-' *50)
+    # Close the Telnet Connection
+    telnet_connection.write(b'quit\n')
+    logging.info("Telnet connection closed.")
 
+if __name__ == "__main__":
+    main()
