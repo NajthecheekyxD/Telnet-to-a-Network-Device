@@ -38,7 +38,6 @@ def menu(telnet_connection):
             save_running_config(telnet_connection)
 
         elif choice == '3':
-            print("Exit")
             break
 
         else:
@@ -53,15 +52,23 @@ def change_hostname(telnet_connection, new_hostname):
     ]
     for command in commands:
         output = execute_command(telnet_connection, command)
-        print(output)  # Print the output after each command
+        # Print the output after each command, excluding unnecessary lines
+        print(filter_output(output))
     print(f"Success! Hostname changed to: {new_hostname}")
 
 def save_running_config(telnet_connection):
     output = execute_command(telnet_connection, 'show running-config')
+    # Save the output to a file
     with open('running_config.txt', 'w') as file:
-        file.write(output)
-    print(output)  # Print the output after the 'show running-config' command
+        file.write(filter_output(output))
+    # Print only the success message
     print("Success! Running configuration saved to: running_config.txt")
+
+def filter_output(output):
+    # Exclude unnecessary lines from the output
+    lines_to_exclude = ['Enter configuration commands', 'End with CNTL/Z', '--More--']
+    filtered_output = '\n'.join(line for line in output.split('\n') if not any(exclude in line for exclude in lines_to_exclude))
+    return filtered_output
 
 def main():
     # Argument parsing
